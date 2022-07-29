@@ -1,8 +1,8 @@
 from pathlib import Path
 from sqlalchemy.orm import sessionmaker
-
+import os
 # from models import Mf4FileInfo as files,Mf4PathInfo as paths,engine
-from models import Mf4FileInfo as files, Mf4PathInfo as paths, engine
+from .models import Mf4FileInfo as files, Mf4PathInfo as paths, engine
 
 Session = sessionmaker(bind=engine)
 
@@ -100,7 +100,7 @@ class dbcurd():
             return False
         return True
 
-    def test(self, mf4path):
+    def query(self, mf4path):
         data = {}
         data['mf4Info'] = []
         retdata = self.session.query(paths).filter(paths.mf4path == mf4path).first()
@@ -109,17 +109,30 @@ class dbcurd():
         for i in range(len(mf4data)):
             data['mf4Info'].append((mf4data[i].mf4fileid, mf4data[i].mf4name))
         print('done')
-        
-        return retdata, mf4data
+
+        return data
+
+    def imgsTransfer(self, mf4name):
+        imgs = dict()
+        imgs['imgList'] = []
+        queryData = self.session.query(files).filter(files.mf4name == mf4name).first()
+        imgOutputPath = queryData.imgoutputpath
+        basename, _ = os.path.splitext(mf4name)
+        for i in range(1, queryData.imgnumber+1):
+            imgPath = imgOutputPath + basename + '_' + f'{i}' + '.png'
+            imgs['imgList'].append(imgPath)
+
+        print('done')
+        return imgs
 
 if __name__ == "__main__":
     ...
 
     d = dbcurd()
-    mf4path = r"C:\Users\XFN1SZH\Desktop\DMS\tool_read"
-    d.test(mf4path)
-    # mf4name = r"CA_S311MCA_8519C_20210912_114553_001.mf4"
-    # d.isimgoutput(mf4name)
+    # mf4path = r"C:\Users\XFN1SZH\Desktop\DMS\tool_read"
+    # d.query(mf4path)
+    mf4name = r"CA_S311MCA_8519C_20210912_114553_001.mf4"
+    d.imgsTransfer(mf4name)
     # d.select(r"C:\Users\XFN1SZH\Desktop\DMS\tool_read")
 
     # d.update("1V_Skoda_SuperB_5383C_20210514_163711_036.mf4")

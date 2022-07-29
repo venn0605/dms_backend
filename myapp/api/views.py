@@ -12,25 +12,24 @@ dbs = dbcurd()
 class mf4path(Resource):
     def get(self,mf4dirpath):
         print(mf4dirpath)
-
-        return jsonify({"hello":"flask_restful"})
-
-        {
-            "mf4nubmer":,
-            "mf4namelist":[
-                (id,mf4name)
-            ],
-        }
+        mf4data = dbs.query(mf4dirpath.replace("/", "\\"))
+        # json format data including mf4filenumber, mf4fileid, mf4name.
+        return jsonify(mf4data)
+        # return jsonify({"hello":"flask_restful"})
 
 
 
-# @api.resource("/mf4name/<path:dirpath>/<str:mf4name>/<int:mf4nameid>")
-# class mf4names(Resource):
 
-#     def get(self,dirpath,mf4name,mf4nameid):
-#         print(dirpath)
-#         print(mf4name)
-#         print(mf4nameid)
+@api.resource("/mf4name/<path:dirpath>/<string:mf4name>/<int:mf4nameid>")
+class mf4names(Resource):
 
-#         return jsonify({"message":200})
+    def get(self,dirpath,mf4name,mf4nameid):
+        print(dirpath)
+        print(mf4name)
+        print(mf4nameid)
+
+        imgsPath = dbs.imgsTransfer(mf4name)
+
+        return jsonify(imgsPath)
+        # return jsonify({"message":200})
 
